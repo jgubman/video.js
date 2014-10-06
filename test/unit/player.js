@@ -646,3 +646,11 @@ test('pause is not called if the player is paused and ended is fired', function(
   player.trigger('ended');
   equal(pauses, 0, 'pause was not called when ended fired');
 });
+
+test('should add an audio class if an audio el is used', function() {
+  var audio = document.createElement('audio'),
+      player = PlayerTest.makePlayer({}, audio),
+      audioClass = 'vjs-audio';
+
+  ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
+});
