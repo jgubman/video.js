@@ -2,13 +2,29 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.10.1 (2014-10-29)
+@heff removed his own stupid error ([view])(https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
+
+## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
 * @andekande improved the German translation ([view](https://github.com/videojs/video.js/pull/1555))
 * @OlehTsvirko added a Ukrainian translation ([view](https://github.com/videojs/video.js/pull/1562))
 * @OlehTsvirko added a Russian translation ([view](https://github.com/videojs/video.js/pull/1563))
 * @thijstriemstra added a Dutch translation ([view](https://github.com/videojs/video.js/pull/1566))
+* @heff updated the poster to use CSS styles to display; fixed the poster not showing if not originally set ([view](https://github.com/videojs/video.js/pull/1568))
+* @mmcc fixed an issue where errors on source tags could get missed ([view](https://github.com/videojs/video.js/pull/1575))
+* @heff enhanced the event listener API to allow for auto-cleanup of listeners on other componenets and elements ([view](https://github.com/videojs/video.js/pull/1588))
+* @mmcc fixed an issue with the VolumeButton assuming it was vertical by default ([view](https://github.com/videojs/video.js/pull/1592))
+* @DevGavin added a Simplified Chinese translation ([view](https://github.com/videojs/video.js/pull/1593))
+* @heff Added the ability to set options for child components directly in the parent options ([view](https://github.com/videojs/video.js/pull/1599))
+* @heff turned on the custom html controls for touch devices ([view](https://github.com/videojs/video.js/pull/1617))
 
---------------------
+## 4.9.1 (2014-10-15)
+* Bumped to videojs-swf v4.5.1 to fix a data sanitization issue ([view](https://github.com/videojs/video.js/pull/1587))
 
 ## 4.9.0 (2014-09-30)
 * @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))

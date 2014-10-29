@@ -55,9 +55,10 @@ vjs.Player = vjs.Component.extend({
     this.cache_ = {};
 
     // Set poster
-    this.poster_ = options['poster'];
+    this.poster_ = options['poster'] || '';
+
     // Set controls
-    this.controls_ = options['controls'];
+    this.controls_ = !!options['controls'];
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -279,6 +280,10 @@ vjs.Player.prototype.createEl = function(){
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
 
+  // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+  // keep track of the original for later so we can know if the source originally failed
+  tag.initNetworkState_ = tag.networkState;
+
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
@@ -459,6 +464,7 @@ vjs.Player.prototype.onWaiting = function(){
 /**
  * A handler for events that signal that waiting has eneded
  * which is not consistent between browsers. See #1351
+ * @private
  */
 vjs.Player.prototype.onWaitEnd = function(){
   this.removeClass('vjs-waiting');
@@ -737,7 +743,14 @@ vjs.Player.prototype.duration = function(seconds){
   return this.cache_.duration || 0;
 };
 
-// Calculates how much time is left. Not in spec, but useful.
+/**
+ * Calculates how much time is left.
+ *
+ *     var timeLeft = myPlayer.remainingTime();
+ *
+ * Not a native video element function, but useful
+ * @return {Number} The time remaining in seconds
+ */
 vjs.Player.prototype.remainingTime = function(){
   return this.duration() - this.currentTime();
 };
@@ -1209,14 +1222,20 @@ vjs.Player.prototype.sourceList_ = function(sources){
   }
 };
 
-// Begin loading the src data
-// http://dev.w3.org/html5/spec/video.html#dom-media-load
+/**
+ * Begin loading the src data.
+ * @return {vjs.Player} Returns the player
+ */
 vjs.Player.prototype.load = function(){
   this.techCall('load');
   return this;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
+/**
+ * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
+ * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+ * @return {String} The current source
+ */
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
 };
@@ -1231,7 +1250,11 @@ vjs.Player.prototype.currentType = function(){
     return this.currentType_ || '';
 };
 
-// Attributes/Options
+/**
+ * Get or set the preload attribute.
+ * @return {String} The preload attribute value when getting
+ * @return {vjs.Player} Returns the player when setting
+ */
 vjs.Player.prototype.preload = function(value){
   if (value !== undefined) {
     this.techCall('setPreload', value);
@@ -1240,6 +1263,12 @@ vjs.Player.prototype.preload = function(value){
   }
   return this.techGet('preload');
 };
+
+/**
+ * Get or set the autoplay attribute.
+ * @return {String} The autoplay attribute value when getting
+ * @return {vjs.Player} Returns the player when setting
+ */
 vjs.Player.prototype.autoplay = function(value){
   if (value !== undefined) {
     this.techCall('setAutoplay', value);
@@ -1248,6 +1277,12 @@ vjs.Player.prototype.autoplay = function(value){
   }
   return this.techGet('autoplay', value);
 };
+
+/**
+ * Get or set the loop attribute on the video element.
+ * @return {String} The loop attribute value when getting
+ * @return {vjs.Player} Returns the player when setting
+ */
 vjs.Player.prototype.loop = function(value){
   if (value !== undefined) {
     this.techCall('setLoop', value);
@@ -1282,6 +1317,12 @@ vjs.Player.prototype.poster_;
 vjs.Player.prototype.poster = function(src){
   if (src === undefined) {
     return this.poster_;
+  }
+
+  // The correct way to remove a poster is to set as an empty string
+  // other falsey values will throw errors
+  if (!src) {
+    src = '';
   }
 
   // update the internal poster variable
@@ -1425,7 +1466,16 @@ vjs.Player.prototype.error = function(err){
   return this;
 };
 
+/**
+ * Returns whether or not the player is in the "ended" state.
+ * @return {Boolean} True if the player is in the ended state, false if not.
+ */
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
+
+/**
+ * Returns whether or not the player is in the "seeking" state.
+ * @return {Boolean} True if the player is in the seeking state, false if not.
+ */
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
 // When the player is first initialized, trigger activity so components
@@ -1562,6 +1612,12 @@ vjs.Player.prototype.listenForUserActivity = function(){
   });
 };
 
+/**
+ * Gets or sets the current playback rate.
+ * @param  {Boolean} rate   New playback rate to set.
+ * @return {Number}         Returns the new playback rate when setting
+ * @return {Number}         Returns the current playback rate when getting
+ */
 vjs.Player.prototype.playbackRate = function(rate) {
   if (rate !== undefined) {
     this.techCall('setPlaybackRate', rate);
@@ -1576,7 +1632,21 @@ vjs.Player.prototype.playbackRate = function(rate) {
 
 };
 
+/**
+ * Store the current audio state
+ * @type {Boolean}
+ * @private
+ */
 vjs.Player.prototype.isAudio_ = false;
+
+/**
+ * Gets or sets the audio flag
+ *
+ * @param  {Boolean} bool    True signals that this is an audio player.
+ * @return {Boolean}         Returns true if player is audio, false if not when getting
+ * @return {vjs.Player}      Returns the player if setting
+ * @private
+ */
 vjs.Player.prototype.isAudio = function(bool) {
   if (bool !== undefined) {
     this.isAudio_ = !!bool;
