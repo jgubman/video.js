@@ -72,6 +72,8 @@ test('currentTime is the seek target during seeking', function() {
         bufferedPercent: noop,
         on: noop,
         trigger: noop,
+        ready: noop,
+        addChild: noop,
         options_: {}
       }, {
         'parentEl': parentEl
@@ -105,7 +107,10 @@ test('dispose removes the object element even before ready fires', function() {
       tech = new vjs.Flash({
         id: noop,
         on: noop,
+        off: noop,
         trigger: noop,
+        ready: noop,
+        addChild: noop,
         options_: {}
       }, {
         'parentEl': parentEl
@@ -142,4 +147,8 @@ test('ready triggering before and after disposing the tech', function() {
   ok(!checkReady.calledTwice, 'checkReady should not be called after the tech is disposed');
 
   vjs.Flash['checkReady'].restore();
+});
+
+test('should have the source handler interface', function() {
+  ok(vjs.Flash.registerSourceHandler, 'has the registerSourceHandler function');
 });

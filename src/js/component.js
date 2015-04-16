@@ -435,8 +435,8 @@ vjs.Component.prototype.removeChild = function(component){
 
   if (!childFound) return;
 
-  this.childIndex_[component.id] = null;
-  this.childNameIndex_[component.name] = null;
+  this.childIndex_[component.id()] = null;
+  this.childNameIndex_[component.name()] = null;
 
   var compEl = component.el();
   if (compEl && compEl.parentNode === this.contentEl()) {
@@ -490,7 +490,7 @@ vjs.Component.prototype.initChildren = function(){
       // Allow options for children to be set at the parent options
       // e.g. videojs(id, { controlBar: false });
       // instead of videojs(id, { children: { controlBar: false });
-      if (parentOptions[name]) {
+      if (parentOptions[name] !== undefined) {
         opts = parentOptions[name];
       }
 
@@ -561,7 +561,7 @@ vjs.Component.prototype.buildCSSClass = function(){
  *
  * The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
  * and `otherComponent.on('eventName', myFunc)` is that this way the listeners
- * will be automatically cleaned up when either component is diposed.
+ * will be automatically cleaned up when either component is disposed.
  * It will also bind myComponent as the context of myFunc.
  *
  * **NOTE**: When using this on elements in the page other than window
@@ -742,7 +742,7 @@ vjs.Component.prototype.isReady_;
  *
  * Allows for delaying ready. Override on a sub class prototype.
  * If you set this.isReadyOnInitFinish_ it will affect all components.
- * Specially used when waiting for the Flash player to asynchrnously load.
+ * Specially used when waiting for the Flash player to asynchronously load.
  *
  * @type {Boolean}
  * @private
@@ -760,7 +760,7 @@ vjs.Component.prototype.readyQueue_;
 /**
  * Bind a listener to the component's ready state
  *
- * Different from event listeners in that if the ready event has already happend
+ * Different from event listeners in that if the ready event has already happened
  * it will trigger the function immediately.
  *
  * @param  {Function} fn Ready listener
@@ -845,7 +845,7 @@ vjs.Component.prototype.removeClass = function(classToRemove){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.show = function(){
-  this.el_.style.display = 'block';
+  this.removeClass('vjs-hidden');
   return this;
 };
 
@@ -855,7 +855,7 @@ vjs.Component.prototype.show = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.hide = function(){
-  this.el_.style.display = 'none';
+  this.addClass('vjs-hidden');
   return this;
 };
 
@@ -886,7 +886,7 @@ vjs.Component.prototype.unlockShowing = function(){
 /**
  * Disable component by making it unshowable
  *
- * Currently private because we're movign towards more css-based states.
+ * Currently private because we're moving towards more css-based states.
  * @private
  */
 vjs.Component.prototype.disable = function(){
@@ -1024,26 +1024,30 @@ vjs.Component.prototype.onResize;
  *
  * This is used to support toggling the controls through a tap on the video.
  *
- * We're requireing them to be enabled because otherwise every component would
+ * We're requiring them to be enabled because otherwise every component would
  * have this extra overhead unnecessarily, on mobile devices where extra
  * overhead is especially bad.
  * @private
  */
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, firstTouch, touchTime, couldBeTap, noTap,
-      xdiff, ydiff, touchDistance, tapMovementThreshold;
+      xdiff, ydiff, touchDistance, tapMovementThreshold, touchTimeThreshold;
 
   // Track the start time so we can determine how long the touch lasted
   touchStart = 0;
   firstTouch = null;
 
   // Maximum movement allowed during a touch event to still be considered a tap
-  tapMovementThreshold = 22;
+  // Other popular libs use anywhere from 2 (hammer.js) to 15, so 10 seems like a nice, round number.
+  tapMovementThreshold = 10;
+
+  // The maximum length a touch can be while still being considered a tap
+  touchTimeThreshold = 200;
 
   this.on('touchstart', function(event) {
     // If more than one finger, don't consider treating this as a click
     if (event.touches.length === 1) {
-      firstTouch = event.touches[0];
+      firstTouch = vjs.obj.copy(event.touches[0]);
       // Record start time so we can detect a tap vs. "touch and hold"
       touchStart = new Date().getTime();
       // Reset couldBeTap tracking
@@ -1082,8 +1086,8 @@ vjs.Component.prototype.emitTapEvents = function(){
     if (couldBeTap === true) {
       // Measure how long the touch lasted
       touchTime = new Date().getTime() - touchStart;
-      // The touch needs to be quick in order to consider it a tap
-      if (touchTime < 250) {
+      // Make sure the touch was less than the threshold to be considered a tap
+      if (touchTime < touchTimeThreshold) {
         event.preventDefault(); // Don't let browser turn this into a click
         this.trigger('tap');
         // It may be good to copy the touchend event object and change the
@@ -1133,15 +1137,15 @@ vjs.Component.prototype.enableTouchActivity = function() {
     // For as long as the they are touching the device or have their mouse down,
     // we consider them active even if they're not moving their finger or mouse.
     // So we want to continue to update that they are active
-    clearInterval(touchHolding);
+    this.clearInterval(touchHolding);
     // report at the same interval as activityCheck
-    touchHolding = setInterval(report, 250);
+    touchHolding = this.setInterval(report, 250);
   });
 
   touchEnd = function(event) {
     report();
     // stop the interval that maintains activity if the touch is holding
-    clearInterval(touchHolding);
+    this.clearInterval(touchHolding);
   };
 
   this.on('touchmove', report);
@@ -1149,3 +1153,80 @@ vjs.Component.prototype.enableTouchActivity = function() {
   this.on('touchcancel', touchEnd);
 };
 
+/**
+ * Creates timeout and sets up disposal automatically.
+ * @param {Function} fn The function to run after the timeout.
+ * @param {Number} timeout Number of ms to delay before executing specified function.
+ * @return {Number} Returns the timeout ID
+ */
+vjs.Component.prototype.setTimeout = function(fn, timeout) {
+  fn = vjs.bind(this, fn);
+
+  // window.setTimeout would be preferable here, but due to some bizarre issue with Sinon and/or Phantomjs, we can't.
+  var timeoutId = setTimeout(fn, timeout);
+
+  var disposeFn = function() {
+    this.clearTimeout(timeoutId);
+  };
+
+  disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+
+  this.on('dispose', disposeFn);
+
+  return timeoutId;
+};
+
+
+/**
+ * Clears a timeout and removes the associated dispose listener
+ * @param {Number} timeoutId The id of the timeout to clear
+ * @return {Number} Returns the timeout ID
+ */
+vjs.Component.prototype.clearTimeout = function(timeoutId) {
+  clearTimeout(timeoutId);
+
+  var disposeFn = function(){};
+  disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+
+  this.off('dispose', disposeFn);
+
+  return timeoutId;
+};
+
+/**
+ * Creates an interval and sets up disposal automatically.
+ * @param {Function} fn The function to run every N seconds.
+ * @param {Number} interval Number of ms to delay before executing specified function.
+ * @return {Number} Returns the interval ID
+ */
+vjs.Component.prototype.setInterval = function(fn, interval) {
+  fn = vjs.bind(this, fn);
+
+  var intervalId = setInterval(fn, interval);
+
+  var disposeFn = function() {
+    this.clearInterval(intervalId);
+  };
+
+  disposeFn.guid = 'vjs-interval-'+ intervalId;
+
+  this.on('dispose', disposeFn);
+
+  return intervalId;
+};
+
+/**
+ * Clears an interval and removes the associated dispose listener
+ * @param {Number} intervalId The id of the interval to clear
+ * @return {Number} Returns the interval ID
+ */
+vjs.Component.prototype.clearInterval = function(intervalId) {
+  clearInterval(intervalId);
+
+  var disposeFn = function(){};
+  disposeFn.guid = 'vjs-interval-'+ intervalId;
+
+  this.off('dispose', disposeFn);
+
+  return intervalId;
+};

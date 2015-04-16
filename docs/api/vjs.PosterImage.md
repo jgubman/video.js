@@ -22,6 +22,8 @@ The component that handles showing the poster image.
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
+  - [clearInterval](#clearinterval-intervalid-) _`inherited`_
+  - [clearTimeout](#cleartimeout-timeoutid-) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [dimensions](#dimensions-width-height-) _`inherited`_
   - [el](#el) _`inherited`_
@@ -42,6 +44,8 @@ The component that handles showing the poster image.
   - [ready](#ready-fn-) _`inherited`_
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
+  - [setInterval](#setinterval-fn-interval-) _`inherited`_
+  - [setTimeout](#settimeout-fn-timeout-) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
@@ -123,6 +127,32 @@ _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js
 
 ---
 
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1223](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1223)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1185](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1185)
+
+---
+
 ### contentEl()
 > Return the component's DOM element for embedding content.
 > Will either be el_ or a new element defined in createEl.
@@ -200,7 +230,7 @@ _inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js
 > whenever touch events happen, and this can be turned off by components that
 > want touch events to act differently.
 
-_inherited from_: [src/js/component.js#L1120](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1120)
+_inherited from_: [src/js/component.js#L1124](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1124)
 
 ---
 
@@ -390,7 +420,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -413,7 +443,7 @@ _inherited from_: [src/js/component.js#L577](https://github.com/videojs/video.js
 ### onClick()
 > Event handler for clicks on the poster image
 
-_defined in_: [src/js/poster.js#L95](https://github.com/videojs/video.js/blob/master/src/js/poster.js#L95)
+_defined in_: [src/js/poster.js#L92](https://github.com/videojs/video.js/blob/master/src/js/poster.js#L92)
 
 ---
 
@@ -501,7 +531,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -538,13 +568,41 @@ _inherited from_: [src/js/component.js#L837](https://github.com/videojs/video.js
 
 ---
 
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1202](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1202)
+
+---
+
 ### setSrc( url )
 > Set the poster source depending on the display method
 
 ##### PARAMETERS: 
 * __url__ 
 
-_defined in_: [src/js/poster.js#L75](https://github.com/videojs/video.js/blob/master/src/js/poster.js#L75)
+_defined in_: [src/js/poster.js#L72](https://github.com/videojs/video.js/blob/master/src/js/poster.js#L72)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1162](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1162)
 
 ---
 

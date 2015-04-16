@@ -88,7 +88,7 @@ or
 
 
 ### loop ###
-The loop attribute causes the video to start over as soon as it ends. This could be used for a visual affect like clouds in the background.
+The loop attribute causes the video to start over as soon as it ends. This could be used for a visual effect like clouds in the background.
 ```html
 <video loop ...>
 or
@@ -149,5 +149,5 @@ notation.
 <video ... data-setup='{ "children": { "controlBar": { "children": { "muteToggle": false } } } }'></video>
 ```
 
-The [components guide](/blob/master/docs/guides/components.md) has an excellent breakdown of the structure of a player, you
+The [components guide](components.md) has an excellent breakdown of the structure of a player, you
 just need to remember to nest child components in a `children` object for each level.

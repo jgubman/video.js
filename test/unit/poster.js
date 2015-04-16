@@ -28,14 +28,19 @@ module('PosterImage', {
 test('should create and update a poster image', function(){
   var posterImage;
 
+  // IE11 adds quotes in the returned background url so need to normalize the result
+  function normalizeUrl(url){
+    return url.replace(new RegExp('\\"', 'g'),'');
+  }
+
   vjs.BACKGROUND_SIZE_SUPPORTED = true;
   posterImage = new vjs.PosterImage(this.mockPlayer);
-  equal(posterImage.el().style.backgroundImage, 'url('+this.poster1+')', 'Background image used');
+  equal(normalizeUrl(posterImage.el().style.backgroundImage), 'url('+this.poster1+')', 'Background image used');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.el().style.backgroundImage, 'url('+this.poster2+')', 'Background image updated');
+  equal(normalizeUrl(posterImage.el().style.backgroundImage), 'url('+this.poster2+')', 'Background image updated');
 });
 
 test('should create and update a fallback image in older browsers', function(){
@@ -60,12 +65,12 @@ test('should remove itself from the document flow when there is no poster', func
   // Update with an empty string
   this.mockPlayer.poster_ = '';
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.el().style.display, 'none', 'Poster image hides with an empty source');
+  equal(posterImage.hasClass('vjs-hidden'), true, 'Poster image hides with an empty source');
 
   // Updated with a valid source
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.el().style.display, '', 'Poster image shows again when there is a source');
+  equal(posterImage.hasClass('vjs-hidden'), false, 'Poster image shows again when there is a source');
 });
 
 test('should hide the poster in the appropriate player states', function(){
@@ -88,4 +93,3 @@ test('should hide the poster in the appropriate player states', function(){
   playerDiv.className = 'video-js vjs-has-started vjs-audio';
   equal(TestHelpers.getComputedStyle(el, 'display'), 'block', 'The poster continues to show when playing audio');
 });
-

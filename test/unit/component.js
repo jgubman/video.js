@@ -1,4 +1,11 @@
-module('Component');
+module('Component', {
+  'setup': function() {
+    this.clock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    this.clock.restore();
+  }
+});
 
 var getFakePlayer = function(){
   return {
@@ -76,7 +83,7 @@ test('should do a deep merge of child options', function(){
   var comp = new vjs.Component(getFakePlayer(), {
     'example': {
       'childOne': { 'foo': 'baz', 'abc': '123' },
-      'childThree': null,
+      'childThree': false,
       'childFour': {}
     }
   });
@@ -88,7 +95,7 @@ test('should do a deep merge of child options', function(){
   ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
   ok(children['childOne']['abc'] === '123', 'value three levels deep added');
   ok(children['childTwo'], 'object two levels deep maintained');
-  ok(children['childThree'] === null, 'object two levels deep removed');
+  ok(children['childThree'] === false, 'object two levels deep removed');
   ok(children['childFour'], 'object two levels deep added');
 
   ok(vjs.Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
@@ -98,32 +105,48 @@ test('should do a deep merge of child options', function(){
 });
 
 test('should allows setting child options at the parent options level', function(){
-  var parent;
+  var parent, options;
 
-  parent = new vjs.Component(getFakePlayer(), {
+  // using children array
+  options = {
     'children': [
-      'component'
+      'component',
+      'nullComponent'
     ],
     // parent-level option for child
     'component': {
       'foo': true
-    }
-  });
+    },
+    'nullComponent': false
+  };
 
+  try {
+    parent = new vjs.Component(getFakePlayer(), options);
+  } catch(err) {
+    ok(false, 'Child with `false` option was initialized');
+  }
   equal(parent.children()[0].options()['foo'], true, 'child options set when children array is used');
 
-  parent = new vjs.Component(getFakePlayer(), {
+  // using children object
+  options = {
     'children': {
       'component': {
         'foo': false
-      }
+      },
+      'nullComponent': {}
     },
     // parent-level option for child
     'component': {
       'foo': true
-    }
-  });
+    },
+    'nullComponent': false
+  };
 
+  try {
+    parent = new vjs.Component(getFakePlayer(), options);
+  } catch(err) {
+    ok(false, 'Child with `false` option was initialized');
+  }
   equal(parent.children()[0].options()['foo'], true, 'child options set when children object is used');
 });
 
@@ -350,9 +373,9 @@ test('should show and hide an element', function(){
   var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.hide();
-  ok(comp.el().style.display === 'none');
+  ok(comp.hasClass('vjs-hidden') === true);
   comp.show();
-  ok(comp.el().style.display === 'block');
+  ok(comp.hasClass('vjs-hidden') === false);
 });
 
 test('dimension() should treat NaN and null as zero', function() {
@@ -439,13 +462,14 @@ test('should use a defined content el for appending children', function(){
 });
 
 test('should emit a tap event', function(){
-  expect(2);
+  expect(3);
 
   // Fake touch support. Real touch support isn't needed for this test.
   var origTouch = vjs.TOUCH_ENABLED;
   vjs.TOUCH_ENABLED = true;
 
   var comp = new vjs.Component(getFakePlayer());
+  var singleTouch = {};
 
   comp.emitTapEvents();
   comp.on('tap', function(){
@@ -470,10 +494,99 @@ test('should emit a tap event', function(){
     { pageX: 0, pageY: 0 }
   ]});
   vjs.trigger(comp.el(), {type: 'touchmove', touches: [
-    { pageX: 10, pageY: 10 }
+    { pageX: 7, pageY: 7 }
   ]});
+  comp.trigger('touchend');
+
+  // A touchmove with a lot of movement by modifying the exisiting touch object
+  // should not trigger a tap
+  singleTouch = { pageX: 0, pageY: 0 };
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  singleTouch.pageX = 100;
+  singleTouch.pageY = 100;
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
+  comp.trigger('touchend');
+
+  // A touchmove with not much movement by modifying the exisiting touch object
+  // should still allow a tap
+  singleTouch = { pageX: 0, pageY: 0 };
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  singleTouch.pageX = 7;
+  singleTouch.pageY = 7;
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
   // Reset to orignial value
   vjs.TOUCH_ENABLED = origTouch;
+});
+
+test('should provide timeout methods that automatically get cleared on component disposal', function() {
+  expect(4);
+
+  var comp = new vjs.Component(getFakePlayer());
+  var timeoutsFired = 0;
+
+  comp.setTimeout(function() {
+    timeoutsFired++;
+    equal(this, comp, 'Timeout fn has the component as its context');
+    ok(true, 'Timeout created and fired.');
+  }, 100);
+
+  var timeoutToClear = comp.setTimeout(function() {
+    timeoutsFired++;
+    ok(false, 'Timeout should have been manually cleared');
+  }, 500);
+
+  comp.setTimeout(function() {
+    timeoutsFired++;
+    ok(false, 'Timeout should have been disposed');
+  }, 1000);
+
+  this.clock.tick(100);
+
+  ok(timeoutsFired === 1, 'One timeout should have fired by this point');
+
+  comp.clearTimeout(timeoutToClear);
+
+  this.clock.tick(500);
+
+  comp.dispose();
+
+  this.clock.tick(1000);
+
+  ok(timeoutsFired === 1, 'One timeout should have fired overall');
+});
+
+test('should provide interval methods that automatically get cleared on component disposal', function() {
+  expect(13);
+
+  var comp = new vjs.Component(getFakePlayer());
+  var intervalsFired = 0;
+
+  var interval = comp.setInterval(function() {
+    intervalsFired++;
+    equal(this, comp, 'Interval fn has the component as its context');
+    ok(true, 'Interval created and fired.');
+  }, 100);
+
+  comp.setInterval(function() {
+    intervalsFired++;
+    ok(false, 'Interval should have been disposed');
+  }, 1200);
+
+  this.clock.tick(500);
+
+  ok(intervalsFired === 5, 'Component interval fired 5 times');
+
+  comp.clearInterval(interval);
+
+  this.clock.tick(600);
+
+  ok(intervalsFired === 5, 'Interval was manually cleared');
+
+  comp.dispose();
+
+  this.clock.tick(1200);
+
+  ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
