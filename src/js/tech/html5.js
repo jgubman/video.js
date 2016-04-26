@@ -257,10 +257,18 @@ class Html5 extends Tech {
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
 
-    if (tt && tt.addEventListener) {
-      tt.addEventListener('change', this.handleTextTrackChange_);
-      tt.addEventListener('addtrack', this.handleTextTrackAdd_);
-      tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+    if (tt) {
+      // Add tracks - if player is initialised after DOM loaded, textTracks
+      // will not trigger addtrack
+      for (let i = 0; i < tt.length; i++) {
+        this.textTracks().addTrack_(tt[i]);
+      }
+
+      if (tt.addEventListener) {
+        tt.addEventListener('change', this.handleTextTrackChange_);
+        tt.addEventListener('addtrack', this.handleTextTrackAdd_);
+        tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+      }
     }
   }
 
@@ -504,7 +512,7 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { 
+  currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
     } else {
@@ -927,9 +935,14 @@ Html5.canControlVolume = function(){
 /*
  * Check if playbackRate is supported in this browser/device.
  *
- * @return {Number} [description]
+ * @return {Boolean}
  */
 Html5.canControlPlaybackRate = function(){
+  // Playback rate API is implemented in Android Chrome, but doesn't do anything
+  // https://github.com/videojs/video.js/issues/3180
+  if (browser.IS_ANDROID && browser.IS_CHROME) {
+    return false;
+  }
   var playbackRate = Html5.TEST_VID.playbackRate;
   Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
   return playbackRate !== Html5.TEST_VID.playbackRate;

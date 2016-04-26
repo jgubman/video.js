@@ -6,6 +6,95 @@ _(none)_
 
 --------------------
 
+## 5.9.2 (2016-04-19)
+* @gkatsev grouped text track errors in the console, if we can ([view](https://github.com/videojs/video.js/pull/3259))
+
+## 5.9.1 (2016-04-19)
+* @benjipott updated IS_CHROME to not be true on MS Edge ([view](https://github.com/videojs/video.js/pull/3232))
+* @mister-ben blacklisted Chrome for Android for playback rate support ([view](https://github.com/videojs/video.js/pull/3246))
+* @gkatsev made the first emulated text track enabled by default ([view](https://github.com/videojs/video.js/pull/3248))
+* @gkatsev fixed removeRemoteTextTracks not working with return value from addRemoteTextTracks ([view](https://github.com/videojs/video.js/pull/3253))
+* @forbesjo added back the background color to the poster ([view](https://github.com/videojs/video.js/pull/3267))
+* @gkatsev fixed text track tests for older IEs ([view](https://github.com/videojs/video.js/pull/3269))
+
+## 5.9.0 (2016-04-05)
+* @gkatsev updated vjs to not add dynamic styles when VIDEOJS_NO_DYNAMIC_STYLE is set ([view](https://github.com/videojs/video.js/pull/3093))
+* @OwenEdwards added basic descriptions track support ([view](https://github.com/videojs/video.js/pull/3098))
+* @kamilbrenk Added lang
+* @arius28 added greek translation file (el.json) ([view](https://github.com/videojs/video.js/pull/3185))
+* @ricardosiri68 changed the relative sass paths ([view](https://github.com/videojs/video.js/pull/3147))
+* @gkatsev added an option to keep the tooltips inside the player bounds ([view](https://github.com/videojs/video.js/pull/3149))
+* @defli added currentWidth and currentHeight methods to the player ([view](https://github.com/videojs/video.js/pull/3144))
+* fix IE8 tests for VIDEOJS_NO_DYNAMIC_STYLE ([view](https://github.com/videojs/video.js/pull/3215))
+* @OwenEdwards fixed links adding extra tab stop with IE by removing anchor tags on videojs init ([view](https://github.com/videojs/video.js/pull/3194))
+* @scaryguy updated videojs cdn urls in the README ([view](https://github.com/videojs/video.js/pull/3195))
+* @mister-ben updated the time tooltips to use the chosen font family ([view](https://github.com/videojs/video.js/pull/3213))
+* @OwenEdwards improved handling of deprecated use of Button component ([view](https://github.com/videojs/video.js/pull/3236))
+* @forbesjo added chrome for PR tests ([view](https://github.com/videojs/video.js/pull/3235))
+* @MCGallaspy added vttjs to the self-hosting guide ([view](https://github.com/videojs/video.js/pull/3229))
+* @chrisauclair added ARIA region and label to player element ([view](https://github.com/videojs/video.js/pull/3227))
+* @andyearnshaw updated document event handlers to use el.ownerDocument ([view](https://github.com/videojs/video.js/pull/3230))
+
+## 5.8.8 (2016-04-04)
+* @vtytar fixed auto-setup failing if taking too long to load ([view](http://github.com/videojs/video.js/pull/3233))
+* @seescode fixed css failing on IE8 due to incorrect ie8 hack ([view](http://github.com/videojs/video.js/pull/3226))
+* @seescode fixed dragging on mute toggle changing the volume ([view](http://github.com/videojs/video.js/pull/3228))
+
+## 5.8.7 (2016-03-29)
+* @llun fixed menus from throwing when focused when empty ([view](https://github.com/videojs/video.js/pull/3218))
+* @mister-ben added dir=ltr to control bar and loading spinner ([view](https://github.com/videojs/video.js/pull/3221))
+* @avreg fixed notSupportedMessage saying video when meaning media ([view](https://github.com/videojs/video.js/pull/3222))
+* @mister-ben fixed missing native HTML5 tracks ([view](https://github.com/videojs/video.js/pull/3212))
+* @mister-ben updated Arabic language files ([view](https://github.com/videojs/video.js/pull/3225))
+
+## 5.8.6 (2016-03-25)
+* @misteroneill fixed typo and indenting in language files ([view](https://github.com/videojs/video.js/pull/3207))
+
+## 5.8.5 (2016-03-17)
+* @gkatsev cleared vttjs script handlers on dispose. Fixed tests ([view](https://github.com/videojs/video.js/pull/3189))
+
+## 5.8.4 (2016-03-17)
+* @gkatsev changed emulated tracks to in novtt to wait for vttjs to load or error before parsing ([view](https://github.com/videojs/video.js/pull/3181))
+
+## 5.8.3 (2016-03-10)
+* @gkatsev fixed keyboard control of menus with titles. Fixes #3164 ([view](https://github.com/videojs/video.js/pull/3165))
+
+## 5.8.2 (2016-03-09)
+* @gkatsev fixed chapters menu. Fixes #3062 ([view](https://github.com/videojs/video.js/pull/3163))
+
+## 5.8.1 (2016-03-07)
+* @gkatsev updated videojs badges in the README ([view](https://github.com/videojs/video.js/pull/3134))
+* @BrandonOCasey converted remaining text-track modules to ES6 ([view](https://github.com/videojs/video.js/pull/3130))
+* @gkatsev cleared waiting/spinner on timeupdate. Fixes #3124 ([view](https://github.com/videojs/video.js/pull/3138))
+* @BrandonOCasey updated text track unit tests to use full es6 syntax ([view](https://github.com/videojs/video.js/pull/3148))
+* @defli added missing var to sandbox index.html example ([view](https://github.com/videojs/video.js/pull/3155))
+* @defli fixed typo and updated Turkish translations ([view](https://github.com/videojs/video.js/pull/3156))
+* @OwenEdwards fixed menu closing on ios, specifically ipad ([view](https://github.com/videojs/video.js/pull/3158))
+
+## 5.8.0 (2016-02-19)
+* @gkatsev added issue and PR templates for github ([view](https://github.com/videojs/video.js/pull/3117))
+* @Nipoto added fa.json (farsi/persian lang file) ([view](https://github.com/videojs/video.js/pull/3116))
+* @forbesjo updated travis to use latest firefox ([view](https://github.com/videojs/video.js/pull/3112))
+* @Naouak updated time display to not change if values do not change ([view](https://github.com/videojs/video.js/pull/3101))
+* @forbesjo updated track settings to not fail restoring settings when localStorage is not available ([view](https://github.com/videojs/video.js/pull/3120))
+* @mister-ben Added en.json as localization template ([view](https://github.com/videojs/video.js/pull/3096))
+* @misteroneill added alt css as video-js-cdn.css ([view](https://github.com/videojs/video.js/pull/3118))
+
+## 5.7.1 (2016-02-11)
+* @alex-phillips fixed reference to videojs-vtt.js dependency ([view](https://github.com/videojs/video.js/pull/3080))
+* @gkatsev fixed minified videojs in IE8. Fixes #3064 and #3070 ([view](https://github.com/videojs/video.js/pull/3104))
+
+## 5.7.0 (2016-02-04)
+* @forbesjo updated emulated tracks to have listeners removed when they are removed ([view](https://github.com/videojs/video.js/pull/3046))
+* @incompl improved the UX of time tooltips ([view](https://github.com/videojs/video.js/pull/3060))
+* @gkatsev updated README to include links to plugins page and getting started and cleaner link to LICENSE ([view](https://github.com/videojs/video.js/pull/3066))
+* @hartman Corrected adaptive layout selectors to match their intent ([view](https://github.com/videojs/video.js/pull/2923))
+* @mister-ben updated Umuted to Unmute in lang files ([view](https://github.com/videojs/video.js/pull/3053))
+* @hartman updated fullscreen and time controls for more consistent widths ([view](https://github.com/videojs/video.js/pull/2893))
+* @hartman Set a min-width for the progress slider of 4em ([view](https://github.com/videojs/video.js/pull/2902))
+* @misteroneill fixed iphone useragent detection ([view](https://github.com/videojs/video.js/pull/3077))
+* @erikyuzwa added ability to add child component at specific index ([view](https://github.com/videojs/video.js/pull/2540))
+
 ## 5.6.0 (2016-01-26)
 * @OwenEdwards added ClickableComponent. Fixed keyboard operation of buttons ([view](https://github.com/videojs/video.js/pull/3032))
 * @OwenEdwards Fixed menu keyboard access and ARIA labeling for screen readers ([view](https://github.com/videojs/video.js/pull/3033))
